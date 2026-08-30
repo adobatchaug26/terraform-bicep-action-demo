@@ -37,4 +37,4 @@ jobs:
       - name: terraform destroy
         if: ${{ inputs.apply == false }}
         run: |
-          terraform apply -auto-approve
+          terraform apply -auto-approve -destroy
