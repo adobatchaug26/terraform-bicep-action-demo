@@ -2,9 +2,16 @@ name: Terraform workflow
 permissions:
   id-token: write
   contents: read
-on: workflow_dispatch
+on: 
+ workflow_dispatch:
+   inputs:
+     apply:
+       default: true
+       type: boolean
+       description: Apply terraform?
+   
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -16,3 +23,18 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: false
+      - name: terraform cli install
+        uses: hashicorp/setup-terraform@v4
+      - name: terraform init
+        run: |
+          terraform init
+          terraform validate
+          terraform plan
+      - name: terraform apply
+        if: ${{ inputs.apply == true }}
+        run: |
+          terraform apply -auto-approve
+      - name: terraform destroy
+        if: ${{ inputs.apply == false }}
+        run: |
+          terraform apply -auto-approve
